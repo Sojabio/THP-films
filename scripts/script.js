@@ -1,5 +1,4 @@
-import API_KEY from "./key.js";
-const link = `http://www.omdbapi.com/?apikey=${API_KEY}`
+const link = `http://www.omdbapi.com/?apikey=527be05d`
 // gère le formulaire et récupère ses données
 const form = document.forms['search-form'];
 
@@ -25,6 +24,7 @@ const getMovies = async (finalSearch) => {
     movies.Search.forEach((movie) => {
       showMovies(element, movie.Title, movie.Year, movie.Poster, movie.imdbID);
     });
+
   } catch (error) {
     console.error('Response error:', error.message);
   }
@@ -44,42 +44,50 @@ const observer = new IntersectionObserver(
   }
 );
 
-// crée les cartes qui montrent le film
-let showMovies = (element, name, year, poster, imdbID) => {
-  element.innerHTML +=
-  `<div class="checked card mb-3" style="max-width: 540px;">
-  <div class="row no-gutters">
-    <div class="col-md-4">
-      <img src="${poster}" class="card-img" alt="poster">
-    </div>
-    <div class="col-md-8">
-      <div class="card-body">
-        <h5 class="card-title">${name}</h5>
-        <p class="card-text">année : ${year}</p>
-        <button type= "button" class="btn btn-info" onclick="getDetails('${imdbID}')">En savoir plus</button>
-      </div>
-    </div>
-  </div>
-</div>`
-
-  const filmElements = document.querySelectorAll(".checked");
-
-  filmElements.forEach((element) => {
-    observer.observe(element);
-  });
-};
-
 
 // récupère les données supplémentaires sur le site
 const getDetails = async (imdbID) => {
   try {
-    const response = await fetch(`${link}&i=${imdbID}`);
+    const response = await fetch(`http://www.omdbapi.com/?apikey=527be05d&i=${imdbID}`);
     const movie = await response.json();
     showDetails(movie.Title, movie.Released,movie.Plot,  movie.Poster)
   } catch (error) {
     console.error('Response error:', error.message);
   }
 };
+
+let showMovies = (element, name, year, poster, imdbID) => {
+  const movieDiv = document.createElement("div");
+  movieDiv.innerHTML = `
+    <div class="checked card mb-3" style="max-width: 540px;">
+      <div class="row no-gutters">
+        <div class="col-md-4">
+          <img src="${poster}" class="card-img" alt="poster">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">${name}</h5>
+            <p class="card-text">année : ${year}</p>
+            <button class="btn btn-info btn-en-savoir-plus" data-imdbid="${imdbID}">En savoir plus</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  const movieElement = movieDiv.querySelector(".checked");
+  element.appendChild(movieElement);
+
+  observer.observe(movieElement);
+
+  const enSavoirPlusButton = movieElement.querySelector(`[data-imdbid="${imdbID}"]`);
+
+  enSavoirPlusButton.addEventListener('click', () => {
+    getDetails(imdbID);
+  });
+};
+
+
+
 
 
 // gestion de la popup
