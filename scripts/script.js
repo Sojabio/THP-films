@@ -1,4 +1,5 @@
-const link = `http://www.omdbapi.com/?apikey=527be05d`
+import API_KEY from "./key.js";
+const link = `http://www.omdbapi.com/?apikey=${API_KEY}`
 // gère le formulaire et récupère ses données
 const form = document.forms['search-form'];
 
@@ -48,7 +49,7 @@ const observer = new IntersectionObserver(
 // récupère les données supplémentaires sur le site
 const getDetails = async (imdbID) => {
   try {
-    const response = await fetch(`http://www.omdbapi.com/?apikey=527be05d&i=${imdbID}`);
+    const response = await fetch(`${link}&i=${imdbID}`);
     const movie = await response.json();
     showDetails(movie.Title, movie.Released,movie.Plot,  movie.Poster)
   } catch (error) {
